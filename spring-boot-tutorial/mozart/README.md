@@ -1,0 +1,3 @@
+To CI-CD should inject the variable into run command line
+For example:
+-Dspring.profiles.active=prod -Dkudu.impala.url=jdbc:impala://xxxx.xxxx.xxxx:21050 -Dkudu.impala.driverclass=xxxx.xxxx.xxxx.xxxx.Driver -Dedumall.dw.jdbc.driverclass=com.mysql.cj.jdbc.MysqlDataSource -Dedumall.dw.jdbc.url=jdbc:mysql://xxxx.xxxx.xxxx:3306/edumall_dw?useUnicode=yes&characterEncoding=UTF-8 -Dedumall.dw.jdbc.username=xxx -Dedumall.dw.jdbc.password=xxxx -Dzookeeper.url=xxxx:2181 -Dzookeeper.client.timeout=15000 -Dapp.jdbc.driverclass=com.mysql.cj.jdbc.MysqlDataSource -Dapp.jdbc.url=jdbc:mysql://xxxx:3306/new_batch_quartz -Dapp.jdbc.username=xxxx -Dapp.jdbc.password=xxxx -Detl.task.num.executor=10

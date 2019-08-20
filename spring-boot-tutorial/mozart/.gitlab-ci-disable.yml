@@ -1,0 +1,155 @@
+image: registry.edumall.io/sys/reza-image:new_namespaces_v2
+
+variables:
+  PUBLIC_DOMAIN: edumall.io
+
+before_script:
+  - source reza-env
+
+stages:
+  - build
+#   - test
+  - package
+  - review
+  - staging
+  - canary
+  - production
+  - release
+  - cleanup
+
+build:
+  stage: build
+  script: # EDITABLE
+    - build_image worker -f Dockerfile . # build image worker
+  only:
+    - branches
+    - tags
+
+# functional_test:
+#   stage: test
+#   script: # EDITABLE
+#     - # WRITE SCRIPT TEST HERE
+#   only:
+#     - branches
+
+package:
+  stage: package
+  script: # EDITABLE
+    - registry_login
+    - push_image worker # push image worker to registry
+  only:
+    - branches
+    - tags
+
+review:
+  stage: review
+  script: # EDITABLE
+    - deploy review web 1 # deploy to environment review, process web with 1 instances
+    - deploy review worker 1 # deploy to environment review, process worker with 1 instances
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    url: http://$CI_PROJECT_PATH_SLUG-$CI_ENVIRONMENT_SLUG.$PUBLIC_DOMAIN
+    on_stop: stop_review
+  only:
+    - branches
+  except:
+    - master
+    - develop
+    - /^release-.*$/
+    - /^hotfix-.*$/
+
+stop_review:
+  stage: cleanup
+  variables:
+    GIT_STRATEGY: none
+  script: # EDITABLE
+    - delete_v2 review worker # delete environment review with process worker
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    action: stop
+  when: manual
+  only:
+    - branches
+  except:
+    - master
+    - develop
+    - /^release-.*$/
+    - /^hotfix-.*$/
+
+staging:
+  stage: staging
+  script: # EDITABLE
+    - deploy staging worker 1 # deploy to environment review, process worker with 1 instances
+  environment:
+    name: staging
+    url: http://$CI_PROJECT_NAME-staging.$PUBLIC_DOMAIN
+    on_stop: stop_staging
+  only:
+    - develop@datawarehouse/mozart-workflow
+
+stop_staging:
+  stage: cleanup
+  variables:
+    GIT_STRATEGY: none
+  script: # EDITABLE
+    - delete_v2 staging worker # delete environment staging with process worker
+  environment:
+    name: staging
+    action: stop
+  when: manual
+  only:
+    - develop@datawarehouse/mozart-workflow
+
+canary:
+  stage: canary
+  script: # EDITABLE
+    - deploy canary web 1
+  environment:
+    name: canary
+    url: http://$CI_PROJECT_NAME.$PUBLIC_DOMAIN
+  only:
+    - master@tcs/sample-cicd
+
+stop_canary:
+  stage: cleanup
+  variables:
+    GIT_STRATEGY: none
+  script: # EDITABLE
+    - delete_v2 canary web # delete environment canary with process web
+  environment:
+    name: canary
+    action: stop
+  when: manual
+  only:
+    - master@tcs/sample-cicd
+
+production:
+  stage: production
+  script: # EDITABLE
+    - deploy production worker 1 # deploy to environment production, process worker with 1 instances
+  environment:
+    name: production
+    url: https://abc.edumall.io
+  when: manual
+  only:
+    - master@trungnt9/mozart-workflow
+
+release:
+  stage: release
+  script: # EDITABLE
+    - deploy production web 3 # deploy to environment production, process web with 3 instances
+    - deploy production worker 1 # deploy to environment production, process worker with 1 instances
+  environment:
+    name: production
+    url: https://abc.edumall.io
+  when: manual
+  only:
+    - tags
+
+cleanup:
+  stage: cleanup
+  script:
+    - remove_image
+  allow_failure: true
+  when: manual
+

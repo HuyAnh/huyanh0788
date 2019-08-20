@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<timestamp key="byDay" datePattern="yyyyMMdd'T'HHmmss" />
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>
+				%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} -
+				%msg%n
+			</Pattern>
+		</layout>
+	</appender>
+
+	<appender name="masterRolling"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>logs/master.log
+		</File>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<fileNamePattern>logs/master.%i.log
+			</fileNamePattern>
+			<minIndex>1</minIndex>
+			<maxIndex>5</maxIndex>
+		</rollingPolicy>
+		<triggeringPolicy
+			class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<maxFileSize>5MB</maxFileSize>
+		</triggeringPolicy>
+		<encoder>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %magenta([%thread])
+				%highlight(%level) %logger{36}.%M - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="workerRolling"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>logs/worker.log
+		</File>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<fileNamePattern>logs/worker.%i.log
+			</fileNamePattern>
+			<minIndex>1</minIndex>
+			<maxIndex>5</maxIndex>
+		</rollingPolicy>
+		<triggeringPolicy
+			class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<maxFileSize>5MB</maxFileSize>
+		</triggeringPolicy>
+		<encoder>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %magenta([%thread])
+				%highlight(%level) %logger{36}.%M - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="app_log"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>logs/app_log.log
+		</File>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<fileNamePattern>logs/app_log.%i.log
+			</fileNamePattern>
+			<minIndex>1</minIndex>
+			<maxIndex>5</maxIndex>
+		</rollingPolicy>
+		<triggeringPolicy
+			class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<maxFileSize>10MB</maxFileSize>
+		</triggeringPolicy>
+		<encoder>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %magenta([%thread])
+				%highlight(%level) %logger{36}.%M - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<logger name="org.apache.zookeeper" level="error" additivity="false">
+		<appender-ref ref="STDOUT" />
+	</logger>
+
+	<logger name="topica.dw.etl.mozart.workflow.common.zookeeper.ZooMaster"
+		level="info" additivity="false">
+		<appender-ref ref="masterRolling" />
+	</logger>
+
+	<logger name="topica.dw.etl.mozart.workflow.common.zookeeper.ZooWorker"
+		level="info" additivity="false">
+		<appender-ref ref="STDOUT" />
+	</logger>
+
+	<logger name="topica.dw.etl.mozart.workflow.common.zookeeper.worker.command"
+		level="INFO" additivity="false">
+		<appender-ref ref="STDOUT" />
+	</logger>
+
+	<logger name="topica.dw.etl.mozart.workflow.job" level="INFO"
+		additivity="false">
+		<appender-ref ref="STDOUT" />
+	</logger>
+
+	<root level="INFO">
+		<!-- <appender-ref ref="STDOUT" /> -->
+		<appender-ref ref="app_log" />
+	</root>
+
+</configuration>

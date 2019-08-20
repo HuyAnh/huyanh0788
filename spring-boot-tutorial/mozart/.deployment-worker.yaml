@@ -1,0 +1,14 @@
+containers:
+  - name: worker
+    externalConfig: true
+    resources: {}
+service:
+  enabled: true
+  type: ClusterIP
+  ports:
+    - internal: 80
+      external: 80
+ingress:
+  enabled: false
+  servicePort: 80
+
